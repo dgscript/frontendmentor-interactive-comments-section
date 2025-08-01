@@ -1,0 +1,324 @@
+import { useState } from "react";
+
+export default function Reply({
+  item,
+  comment,
+  userComments,
+  setUserComments,
+  setReplyingtoId,
+  setReplyIndexToDelete,
+  setReplyCommentIndex,
+  setDeleteReplyPopUp,
+}: any) {
+  const [isReplyBeingEdited, setIsReplyBeingEdited] = useState<boolean>(false);
+  const [editedContent, setEditedContent] = useState<string>("");
+  const [isContentEmpty, setIsContentEmpty] = useState<boolean>(false);
+  const [alreadyVotedPlus, setAlreadyVotedPlus] = useState<boolean>(false);
+  const [alreadyVotedMinus, setAlreadyVotedMinus] = useState<boolean>(false);
+
+  return (
+    <div
+      key={item.id}
+      className="bg-white rounded-[0.5rem] p-6 flex gap-6 max-md:flex-col-reverse"
+    >
+      {/* score buttons */}
+      <div className="max-md:flex justify-between">
+        <div className="bg-grey-100 flex md:flex-col items-center justify-between md:p-3 max-md:py-2 max-md:px-3 rounded-[0.5rem] md:h-24 md:min-w-10">
+          {/* plus button */}
+          <button
+            onClick={() => {
+              if (!alreadyVotedPlus) {
+                const updatedScore = { ...item, score: item.score + 1 };
+                const updatedReplies = comment.replies.map((reply: any) => {
+                  return reply.id === item.id ? updatedScore : reply;
+                });
+                const updatedComment = { ...comment, replies: updatedReplies };
+                const updatedUserComments = userComments.comments.map(
+                  (currentComment: any) => {
+                    return currentComment.id === comment.id
+                      ? updatedComment
+                      : currentComment;
+                  }
+                );
+                setUserComments({
+                  ...userComments,
+                  comments: updatedUserComments,
+                });
+                setAlreadyVotedPlus(true);
+                setAlreadyVotedMinus(false);
+              }
+            }}
+            className="text-grey-500 hover:cursor-pointer w-3 h-3 flex justify-center items-center"
+          >
+            <svg width="11" height="11" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M6.33 10.896c.137 0 .255-.05.354-.149.1-.1.149-.217.149-.354V7.004h3.315c.136 0 .254-.05.354-.149.099-.1.148-.217.148-.354V5.272a.483.483 0 0 0-.148-.354.483.483 0 0 0-.354-.149H6.833V1.4a.483.483 0 0 0-.149-.354.483.483 0 0 0-.354-.149H4.915a.483.483 0 0 0-.354.149c-.1.1-.149.217-.149.354v3.37H1.08a.483.483 0 0 0-.354.15c-.1.099-.149.217-.149.353v1.23c0 .136.05.254.149.353.1.1.217.149.354.149h3.333v3.39c0 .136.05.254.15.353.098.1.216.149.353.149H6.33Z"
+                fill="#C5C6EF"
+              />
+            </svg>
+          </button>
+          <span className="font-semibold text-purple-600 max-md:px-4">
+            {item.score}
+          </span>
+          {/* minuts button */}
+          <button
+            onClick={() => {
+              if (!alreadyVotedMinus) {
+                const updatedScore = { ...item, score: item.score - 1 };
+                const updatedReplies = comment.replies.map((reply: any) => {
+                  return reply.id === item.id ? updatedScore : reply;
+                });
+                const updatedComment = { ...comment, replies: updatedReplies };
+                const updatedUserComments = userComments.comments.map(
+                  (currentComment: any) => {
+                    return currentComment.id === comment.id
+                      ? updatedComment
+                      : currentComment;
+                  }
+                );
+                setUserComments({
+                  ...userComments,
+                  comments: updatedUserComments,
+                });
+                setAlreadyVotedMinus(true);
+                setAlreadyVotedPlus(false);
+              }
+            }}
+            className="text-grey-500 hover:cursor-pointer w-3 h-3 flex justify-center items-center"
+          >
+            <svg width="11" height="3" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M9.256 2.66c.204 0 .38-.056.53-.167.148-.11.222-.243.222-.396V.722c0-.152-.074-.284-.223-.395a.859.859 0 0 0-.53-.167H.76a.859.859 0 0 0-.53.167C.083.437.009.57.009.722v1.375c0 .153.074.285.223.396a.859.859 0 0 0 .53.167h8.495Z"
+                fill="#C5C6EF"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* these buttons will apear if the screen width is smaller than 760px */}
+        <div className="md:hidden max-md:flex">
+          {item.user.username === "juliusomo" ? (
+            <div className="flex gap-5 *:flex *:items-center *:gap-2 *:font-semibold">
+              {/* delete button */}
+              <button
+                onClick={() => {
+                  setReplyIndexToDelete(item.id);
+                  setDeleteReplyPopUp(true);
+
+                  const commentIndex = userComments.comments.findIndex(
+                    (comment: any) =>
+                      comment.replies.find((reply: any) => reply.id === item.id)
+                  );
+
+                  setReplyCommentIndex(commentIndex);
+                }}
+                className="text-pink-400 hover:cursor-pointer active:text-pink-200 active:**:fill-pink-200"
+              >
+                <svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M1.167 12.448c0 .854.7 1.552 1.555 1.552h6.222c.856 0 1.556-.698 1.556-1.552V3.5H1.167v8.948Zm10.5-11.281H8.75L7.773 0h-3.88l-.976 1.167H0v1.166h11.667V1.167Z"
+                    fill="#ED6368"
+                  />
+                </svg>
+                Delete
+              </button>
+
+              {/* edit button */}
+              <button
+                onClick={() => {
+                  setIsReplyBeingEdited(!isReplyBeingEdited);
+                  setEditedContent(item.content);
+                }}
+                className="text-purple-600 hover:cursor-pointer active:text-purple-200 active:**:fill-purple-200"
+              >
+                <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M13.479 2.872 11.08.474a1.75 1.75 0 0 0-2.327-.06L.879 8.287a1.75 1.75 0 0 0-.5 1.06l-.375 3.648a.875.875 0 0 0 .875.954h.078l3.65-.333c.399-.04.773-.216 1.058-.499l7.875-7.875a1.68 1.68 0 0 0-.061-2.371Zm-2.975 2.923L8.159 3.449 9.865 1.7l2.389 2.39-1.75 1.706Z"
+                    fill="#5357B6"
+                  />
+                </svg>
+                Edit
+              </button>
+            </div>
+          ) : (
+            <button
+              className="flex items-center font-semibold gap-2 text-purple-600 hover:cursor-pointer active:text-purple-200 active:fill-purple-200 active:**:fill-purple-200"
+              onClick={() => {
+                setReplyingtoId(item.id);
+              }}
+            >
+              <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
+                  fill="#5357B6"
+                />
+              </svg>{" "}
+              Reply
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="w-full">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <img
+              src={item.user.image.png}
+              alt={item.user.username}
+              className="h-8 w-8"
+            />
+            <p
+              className={`font-semibold text-grey-800 ${
+                item.user.username === "juliusomo" && "you-tag"
+              }`}
+            >
+              {item.user.username}
+            </p>
+            <p className="text-grey-500">{item.createdAt}</p>
+          </div>
+          <div className="max-md:hidden">
+            {item.user.username === "juliusomo" ? (
+              <div className="flex gap-5 *:flex *:items-center *:gap-2 *:font-semibold">
+                {/* delete button */}
+                <button
+                  onClick={() => {
+                    setReplyIndexToDelete(item.id);
+                    setDeleteReplyPopUp(true);
+
+                    const commentIndex = userComments.comments.findIndex(
+                      (comment: any) =>
+                        comment.replies.find(
+                          (reply: any) => reply.id === item.id
+                        )
+                    );
+
+                    setReplyCommentIndex(commentIndex);
+                  }}
+                  className="text-pink-400 hover:cursor-pointer active:text-pink-200 active:**:fill-pink-200"
+                >
+                  <svg
+                    width="12"
+                    height="14"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1.167 12.448c0 .854.7 1.552 1.555 1.552h6.222c.856 0 1.556-.698 1.556-1.552V3.5H1.167v8.948Zm10.5-11.281H8.75L7.773 0h-3.88l-.976 1.167H0v1.166h11.667V1.167Z"
+                      fill="#ED6368"
+                    />
+                  </svg>
+                  Delete
+                </button>
+
+                {/* edit button */}
+                <button
+                  onClick={() => {
+                    setIsReplyBeingEdited(!isReplyBeingEdited);
+                    setEditedContent(item.content);
+                  }}
+                  className="text-purple-600 hover:cursor-pointer active:text-purple-200 active:**:fill-purple-200"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M13.479 2.872 11.08.474a1.75 1.75 0 0 0-2.327-.06L.879 8.287a1.75 1.75 0 0 0-.5 1.06l-.375 3.648a.875.875 0 0 0 .875.954h.078l3.65-.333c.399-.04.773-.216 1.058-.499l7.875-7.875a1.68 1.68 0 0 0-.061-2.371Zm-2.975 2.923L8.159 3.449 9.865 1.7l2.389 2.39-1.75 1.706Z"
+                      fill="#5357B6"
+                    />
+                  </svg>
+                  Edit
+                </button>
+              </div>
+            ) : (
+              <button
+                className="flex items-center font-semibold gap-2 text-purple-600 hover:cursor-pointer active:text-purple-200 active:fill-purple-200 active:**:fill-purple-200"
+                onClick={() => {
+                  setReplyingtoId(item.id);
+                }}
+              >
+                <svg width="14" height="13" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M.227 4.316 5.04.16a.657.657 0 0 1 1.085.497v2.189c4.392.05 7.875.93 7.875 5.093 0 1.68-1.082 3.344-2.279 4.214-.373.272-.905-.07-.767-.51 1.24-3.964-.588-5.017-4.829-5.078v2.404c0 .566-.664.86-1.085.496L.227 5.31a.657.657 0 0 1 0-.993Z"
+                    fill="#5357B6"
+                  />
+                </svg>{" "}
+                Reply
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="pt-3 flex">
+          {isReplyBeingEdited ? (
+            <textarea
+              onChange={(e) => {
+                setEditedContent(e.target.value.trimStart());
+              }}
+              value={editedContent}
+              className={` ${
+                isContentEmpty ? "border-red-400 ease-in-out duration-75" : ""
+              } border-1 rounded-[0.5rem] border-purple-200 resize-none grow focus:outline-2 focus:outline-grey-800 px-5 py-3 min-h-25`}
+            ></textarea>
+          ) : (
+            <p className="text-grey-500">
+              <span className="text-purple-600 font-semibold">{`@${item.replyingTo}`}</span>{" "}
+              {item.content}
+            </p>
+          )}
+        </div>
+        {item.user.username === "juliusomo" && (
+          <div
+            className={`flex w-full justify-end mt-4 ${
+              isReplyBeingEdited ? "flex" : "hidden"
+            }`}
+          >
+            <button
+              onClick={() => {
+                if (editedContent === "") {
+                  setIsContentEmpty(true);
+                  setTimeout(() => {
+                    setIsContentEmpty(false);
+                  }, 700);
+                } else {
+                  const commentIndex = userComments.comments.indexOf(comment);
+
+                  const updatedReply = { ...item, content: editedContent };
+
+                  const commentReplies = [
+                    ...userComments.comments[commentIndex].replies,
+                  ];
+
+                  const updatedReplies = commentReplies.map((reply) =>
+                    reply === item ? updatedReply : reply
+                  );
+
+                  const updatedCommentWithReply = {
+                    ...userComments.comments[commentIndex],
+                    replies: updatedReplies,
+                  };
+
+                  const updatedComments = userComments.comments.map(
+                    (currentComment: any) =>
+                      currentComment === comment
+                        ? updatedCommentWithReply
+                        : currentComment
+                  );
+
+                  const updatedUserComments = {
+                    ...userComments,
+                    comments: updatedComments,
+                  };
+
+                  setUserComments(updatedUserComments);
+                  setIsReplyBeingEdited(false);
+                }
+              }}
+              className="bg-purple-600 rounded-[0.5rem] py-3 px-5 font-semibold text-white active:bg-purple-200 hover:cursor-pointer"
+            >
+              UPDATE
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

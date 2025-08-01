@@ -1,0 +1,41 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+@import "tailwindcss";
+
+body {
+  font-family: "Rubik", sans-serif;
+  background-color: var(--grey-100);
+}
+
+@theme {
+  --color-purple-600: hsl(238, 40%, 52%);
+  --color-pink-400: hsl(358, 79%, 66%);
+  --color-purple-200: hsl(239, 57%, 85%);
+  --color-pink-200: hsl(357, 100%, 86%);
+  --color-grey-800: hsl(212, 24%, 26%);
+  --color-grey-500: hsl(211, 10%, 45%);
+  --color-grey-400: hsl(210, 17%, 66%);
+  --color-grey-100: hsl(223, 19%, 93%);
+  --color-grey-50: hsl(228, 33%, 97%);
+}
+
+:root {
+  --purple-600: hsl(238, 40%, 52%);
+  --pink-400: hsl(358, 79%, 66%);
+  --purple-200: hsl(239, 57%, 85%);
+  --pink-200: hsl(357, 100%, 86%);
+  --grey-800: hsl(212, 24%, 26%);
+  --grey-500: hsl(211, 10%, 45%);
+  --grey-400: hsl(210, 17%, 66%);
+  --grey-100: hsl(223, 19%, 93%);
+  --grey-50: hsl(228, 33%, 97%);
+}
+
+.you-tag:after {
+  content: "you";
+  background-color: var(--purple-600);
+  color: white;
+  font-size: 0.8rem;
+  padding: 2px 5px;
+  border-radius: 3px;
+  margin-left: 5px;
+}
