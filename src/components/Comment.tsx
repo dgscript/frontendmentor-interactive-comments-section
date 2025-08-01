@@ -101,7 +101,9 @@ export default function Comment({
                   setDeleteCommentPopUp(true);
                   setCommentIndexToDelete(item.id);
                 }}
-                className="text-pink-400 hover:cursor-pointer active:text-pink-200 active:**:fill-pink-200"
+                className={`text-pink-400 hover:cursor-pointer active:text-pink-200 active:**:fill-pink-200 ${
+                  isCommentBeingEdited ? "hidden!" : ""
+                }`}
               >
                 <svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -118,7 +120,9 @@ export default function Comment({
                   setIsCommentBeingEdited(!isCommentBeingEdited);
                   setEditedContent(item.content);
                 }}
-                className="text-purple-600 hover:cursor-pointer active:text-purple-200 active:**:fill-purple-200"
+                className={`text-purple-600 hover:cursor-pointer active:text-purple-200 active:**:fill-purple-200 ${
+                  isCommentBeingEdited ? "hidden!" : ""
+                }`}
               >
                 <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -128,8 +132,44 @@ export default function Comment({
                 </svg>
                 Edit
               </button>
+
+              {/* update comment */}
+              {isCommentBeingEdited && (
+                <button
+                  onClick={() => {
+                    if (editedContent === "") {
+                      setIsContentEmpty(true);
+                      setTimeout(() => {
+                        setIsContentEmpty(false);
+                      }, 700);
+                    } else {
+                      const updatedEditedContent = {
+                        ...item,
+                        content: editedContent,
+                      };
+
+                      const updatedComment = userComments.comments.map(
+                        (comment: any) =>
+                          comment === item ? updatedEditedContent : comment
+                      );
+
+                      const updatedEditedComments = {
+                        ...userComments,
+                        comments: updatedComment,
+                      };
+
+                      setUserComments(updatedEditedComments);
+                      setIsCommentBeingEdited(false);
+                    }
+                  }}
+                  className="bg-purple-600 rounded-[0.5rem] py-3 px-5 font-semibold text-white active:bg-purple-200 hover:cursor-pointer"
+                >
+                  UPDATE
+                </button>
+              )}
             </div>
           ) : (
+            /* reply button */
             <button
               className="flex items-center font-semibold gap-2 text-purple-600 hover:cursor-pointer active:text-purple-200 active:fill-purple-200 active:**:fill-purple-200"
               onClick={() => {
@@ -229,7 +269,7 @@ export default function Comment({
           </div>
         </div>
         <div className="pt-3 flex">
-          {/* this will apear whent the edit button is clicked */}
+          {/* this will appear whent the edit button is clicked */}
           {isCommentBeingEdited ? (
             <textarea
               onChange={(e) => {
@@ -278,7 +318,7 @@ export default function Comment({
                   setIsCommentBeingEdited(false);
                 }
               }}
-              className="bg-purple-600 rounded-[0.5rem] py-3 px-5 font-semibold text-white active:bg-purple-200 hover:cursor-pointer"
+              className="bg-purple-600 rounded-[0.5rem] py-3 px-5 font-semibold text-white active:bg-purple-200 hover:cursor-pointer max-md:hidden!"
             >
               UPDATE
             </button>

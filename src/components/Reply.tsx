@@ -112,7 +112,9 @@ export default function Reply({
 
                   setReplyCommentIndex(commentIndex);
                 }}
-                className="text-pink-400 hover:cursor-pointer active:text-pink-200 active:**:fill-pink-200"
+                className={`text-pink-400 hover:cursor-pointer active:text-pink-200 active:**:fill-pink-200 ${
+                  isReplyBeingEdited ? "hidden!" : ""
+                }`}
               >
                 <svg width="12" height="14" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -129,7 +131,9 @@ export default function Reply({
                   setIsReplyBeingEdited(!isReplyBeingEdited);
                   setEditedContent(item.content);
                 }}
-                className="text-purple-600 hover:cursor-pointer active:text-purple-200 active:**:fill-purple-200"
+                className={`text-purple-600 hover:cursor-pointer active:text-purple-200 active:**:fill-purple-200 ${
+                  isReplyBeingEdited ? "hidden!" : ""
+                }`}
               >
                 <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -139,6 +143,56 @@ export default function Reply({
                 </svg>
                 Edit
               </button>
+
+              {/* update button */}
+              {isReplyBeingEdited && (
+                <button
+                  onClick={() => {
+                    if (editedContent === "") {
+                      setIsContentEmpty(true);
+                      setTimeout(() => {
+                        setIsContentEmpty(false);
+                      }, 700);
+                    } else {
+                      const commentIndex =
+                        userComments.comments.indexOf(comment);
+
+                      const updatedReply = { ...item, content: editedContent };
+
+                      const commentReplies = [
+                        ...userComments.comments[commentIndex].replies,
+                      ];
+
+                      const updatedReplies = commentReplies.map((reply) =>
+                        reply === item ? updatedReply : reply
+                      );
+
+                      const updatedCommentWithReply = {
+                        ...userComments.comments[commentIndex],
+                        replies: updatedReplies,
+                      };
+
+                      const updatedComments = userComments.comments.map(
+                        (currentComment: any) =>
+                          currentComment === comment
+                            ? updatedCommentWithReply
+                            : currentComment
+                      );
+
+                      const updatedUserComments = {
+                        ...userComments,
+                        comments: updatedComments,
+                      };
+
+                      setUserComments(updatedUserComments);
+                      setIsReplyBeingEdited(false);
+                    }
+                  }}
+                  className="bg-purple-600 rounded-[0.5rem] py-3 px-5 font-semibold text-white active:bg-purple-200 hover:cursor-pointer"
+                >
+                  UPDATE
+                </button>
+              )}
             </div>
           ) : (
             <button
@@ -271,6 +325,7 @@ export default function Reply({
               isReplyBeingEdited ? "flex" : "hidden"
             }`}
           >
+            {/* update button */}
             <button
               onClick={() => {
                 if (editedContent === "") {
@@ -312,7 +367,7 @@ export default function Reply({
                   setIsReplyBeingEdited(false);
                 }
               }}
-              className="bg-purple-600 rounded-[0.5rem] py-3 px-5 font-semibold text-white active:bg-purple-200 hover:cursor-pointer"
+              className="bg-purple-600 rounded-[0.5rem] py-3 px-5 font-semibold text-white active:bg-purple-200 hover:cursor-pointer max-md:hidden!"
             >
               UPDATE
             </button>
